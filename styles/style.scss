@@ -1,0 +1,68 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+.hero-bg {
+  background: url("../images/hero.png") bottom no-repeat;
+  background-size: cover;
+  min-height: calc(100vh - 65px);
+  padding: 80px 0;
+
+  .hero-animation {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -40%);
+  }
+}
+
+.clients-bg {
+  background-image: url("../images/clientsbg.png");
+  background-size: cover;
+  overflow-x: hidden;
+}
+
+nav.auth-nav {
+  &.bg-background\/70 {
+    background-color: hsl(var(--nextui-background) / -0.3);
+  }
+}
+
+.auth-main {
+  min-height: calc(100vh - 65px);
+
+  .isolate {
+    width: 100%
+  }
+}
+
+.sn-nav-link {
+  position: relative;
+  padding-left: 15px;
+
+  &:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    width: 5px;
+    height: 70%;
+    border-top-right-radius: 25px;
+    border-bottom-right-radius: 25px;
+    transition: .3s ease-in-out;
+  }
+
+  &:hover, &.sn-active {
+    &:after {
+      background: rgb(77, 55, 144);
+    }
+  }
+
+  a {
+    transition: .3s ease-in-out;
+  }
+}
