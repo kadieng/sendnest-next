@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent, useEffect } from 'react';
 import { Input, Textarea } from '@nextui-org/input';
 import { EyeFilledIcon } from '@/components/EyeFilledIcon';
 import { EyeSlashFilledIcon } from '@/components/EyeSlashFilledIcon';
@@ -10,40 +10,18 @@ import { Link } from '@nextui-org/link';
 import { Button } from '@nextui-org/button';
 import { register } from '@/app/http/auth';
 import { useMutation } from '@tanstack/react-query';
+import { Country, State } from 'country-state-city';
+import { CountryType, StateType } from '../../../@types';
+import { useRouter } from 'next/navigation';
 
 function classNames({ ...classes }: any) {
   return classes.filter(Boolean).join(' ');
 }
 
 export default function Register() {
-  const [selectedState, setSelectedState] = useState('');
-  const [lgas, setLgas] = useState<string[] | undefined>([]);
-  const [lga, setLga] = useState('');
-  const [isVisible, setIsVisible] = React.useState(false);
-  const [isVisible2, setIsVisible2] = React.useState(false);
-
-  const toggleVisibility = () => setIsVisible(!isVisible);
-  const toggleVisibility2 = () => setIsVisible2(!isVisible2);
-  const handleState = (e: any) => {
-    setSelectedState(e.target.value);
-    setLgas(states.find((stat) => stat.state === e.target.value)?.lgas);
-  };
-  const handleLGA = (e: any) => {
-    setLga(e.target.value);
-  };
-
-  const { mutate, isLoading } = useMutation(register, {
-    onSuccess: (data) => {
-      if (data.status === 200) {
-        return;
-      }
-    },
-    onError: (error: any) => {
-      // notify({ message: error.message, type: 'error' });
-      console.log(error);
-    },
-  });
-
+  const router = useRouter();
+  const [selectedCountry, setSelectedCountry] = useState<CountryType>();
+  const [selectedState, setSelectedState] = useState<StateType>();
   const [signUpDetails, setRegisterDetails] = useState({
     firstName: '',
     lastName: '',
@@ -57,26 +35,62 @@ export default function Register() {
     phone: '',
   });
 
+  const [isVisible, setIsVisible] = React.useState(false);
+  const [isVisible2, setIsVisible2] = React.useState(false);
+
+  const toggleVisibility = () => setIsVisible(!isVisible);
+  const toggleVisibility2 = () => setIsVisible2(!isVisible2);
+
+  const { mutate, isLoading } = useMutation(register, {
+    onSuccess: (data) => {
+      if (data.statusCode === 201) {
+        console.log(data);
+
+        router.push(`/complete-signup/?email=${signUpDetails.email}`);
+
+        return;
+      }
+    },
+    onError: (error: any) => {
+      // notify({ message: error.message, type: 'error' });
+      console.log(error);
+    },
+  });
+
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setRegisterDetails((prev) => ({ ...prev, [name]: value }));
   };
 
-  console.log(signUpDetails);
+  const handleCountryChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const country = Country.getCountryByCode(event.target.value as string);
+    setSelectedCountry(country as CountryType);
+    setSelectedState(undefined);
+  };
+
+  const handleStateChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const state = State.getStateByCode(event.target.value as string);
+    setSelectedState(state as StateType);
+  };
+
+  const countries = Country.getAllCountries();
+  const states = selectedCountry ? State.getStatesOfCountry(selectedCountry?.isoCode) : [];
 
   const handleRegister = (event: any) => {
     event.preventDefault();
-    const data = {
-      ...signUpDetails,
-      state: selectedState,
-      lga: lga,
-    };
-
-    console.log(data);
 
     try {
-    } catch (error) {}
+      mutate({ ...signUpDetails, country: selectedCountry?.name, state: selectedState?.name } as any);
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  useEffect(() => {
+    console.log(selectedCountry);
+    console.log(selectedCountry?.name);
+    console.log(selectedState);
+  }, [selectedCountry, selectedState]);
 
   return (
     <div className="isolate bg-white px-6 py-12 sm:py-16 lg:px-8">
@@ -106,6 +120,7 @@ export default function Register() {
               variant="bordered"
               name="firstName"
               onChange={handleChange}
+              value={signUpDetails.firstName}
             />
           </div>
           <div>
@@ -116,6 +131,7 @@ export default function Register() {
               variant="bordered"
               name="lastName"
               onChange={handleChange}
+              value={signUpDetails.lastName}
             />
           </div>
           <div>
@@ -126,6 +142,7 @@ export default function Register() {
               variant="bordered"
               name="middleName"
               onChange={handleChange}
+              value={signUpDetails.middleName}
             />
           </div>
           <div>
@@ -136,6 +153,7 @@ export default function Register() {
               variant="bordered"
               name="username"
               onChange={handleChange}
+              value={signUpDetails.username}
             />
           </div>
           <div>
@@ -146,6 +164,7 @@ export default function Register() {
               variant="bordered"
               name="email"
               onChange={handleChange}
+              value={signUpDetails.email}
             />
           </div>
           <div>
@@ -156,6 +175,7 @@ export default function Register() {
               variant="bordered"
               name="phone"
               onChange={handleChange}
+              value={signUpDetails.phone}
             />
           </div>
           <div>
@@ -176,6 +196,7 @@ export default function Register() {
               className="max-w-xs"
               name="password"
               onChange={handleChange}
+              value={signUpDetails.password}
             />
           </div>
           <div>
@@ -199,35 +220,37 @@ export default function Register() {
           <div>
             <Select
               color="primary"
-              label="Select State"
-              placeholder="Select a state"
+              label="Select Country"
+              placeholder="Select a country"
               className="max-w-xs"
-              onChange={handleState}
+              onChange={handleCountryChange}
+              value={selectedCountry?.name ?? ''}
             >
-              {states.map((stat) => (
-                <SelectItem key={stat.state} value={stat.state}>
-                  {stat.state}
+              {countries.map((country) => (
+                <SelectItem key={country?.isoCode} value={country?.name}>
+                  {country?.name}
                 </SelectItem>
               ))}
             </Select>
           </div>
+
           <div>
-            {lgas && (
-              <Select
-                color="primary"
-                label="Select LGA"
-                placeholder="Select a lga"
-                className="max-w-xs"
-                onChange={handleLGA}
-              >
-                {lgas.map((lga) => (
-                  <SelectItem key={lga} value={lga}>
-                    {lga}
-                  </SelectItem>
-                ))}
-              </Select>
-            )}
+            <Select
+              color="primary"
+              label="Select State"
+              placeholder="Select a state"
+              className="max-w-xs"
+              onChange={handleStateChange}
+              value={selectedState?.name ?? ''}
+            >
+              {states.map((state) => (
+                <SelectItem key={state?.isoCode} value={state?.name}>
+                  {state?.name}
+                </SelectItem>
+              ))}
+            </Select>
           </div>
+
           <div className="sm:col-span-2">
             <Textarea
               variant="bordered"
@@ -236,11 +259,12 @@ export default function Register() {
               className="col-span-12 md:col-span-6 mb-6 md:mb-0"
               onChange={handleChange}
               name="address"
+              value={signUpDetails.address}
             />
           </div>
         </div>
         <div className="mt-10">
-          <Button color="primary" type="submit" className="block w-full">
+          <Button color="primary" type="submit" className="block w-full" isLoading={isLoading}>
             Create Account
           </Button>
         </div>

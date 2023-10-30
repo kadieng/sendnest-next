@@ -1,14 +1,5 @@
-import axios from 'axios';
-
-const AUTH_HTTP_URL = 'https://send-nest.vercel.app/v1/api';
-
-const $http = axios.create({
-  baseURL: AUTH_HTTP_URL,
-  timeout: 30000,
-  headers: {
-    'Content-Type': 'application/json; charset=UTF-8',
-  },
-});
+import axios from '@/utils/http';
+import $http from '@/utils/http';
 
 export const register = async (props: {
   firstName: string;
@@ -23,29 +14,51 @@ export const register = async (props: {
   phone: string;
 }) => {
   try {
-    const res = await $http.post('/users/signup', props);
+    const res = await axios.post('/users/signup', props);
     console.log(res?.data);
     return res?.data;
   } catch (e: any) {
     console.log(e);
-    return e.response.data ?? { message: e.message };
+    throw e?.response?.data || { message: e.message };
   }
 };
 
-export const login = async (props: { email: string; password: string }) => {
+export const verifyUserToken = async (props: { email: string; otp: string }) => {
   try {
-    const res = await $http.post('/users/signup', props);
+    const res = await axios.post('/users/verify_user_token', props);
     console.log(res?.data);
     return res?.data;
   } catch (e: any) {
     console.log(e);
-    return e.response.data ?? { message: e.message };
+    throw e.response.data || { message: e.message };
+  }
+};
+
+export const login = async (props: { username: string; password: string }) => {
+  try {
+    const res = await axios.post('/auth/login', props);
+    console.log(res?.data);
+    return res?.data;
+  } catch (e: any) {
+    console.log(e);
+    throw e.response.data || { message: e.message };
+  }
+};
+
+export const refreshToken = async (payload: any) => {
+  try {
+    const res = await $http.get('/users/me', payload);
+    console.log(res?.data);
+    return res?.data;
+  } catch (e: any) {
+    console.log(e);
+    throw e.response.data || { message: e.message };
   }
 };
 
 export const forgotPassword = async (props: { email: string }) => {
   try {
-    const res = await $http.post('/users/signup', props);
+    const res = await axios.post('/users/reset-password', props);
     console.log(res?.data);
     return res?.data;
   } catch (e: any) {
@@ -56,7 +69,7 @@ export const forgotPassword = async (props: { email: string }) => {
 
 export const verifyResetPassword = async (props: { otp: string; password: string; email: string }) => {
   try {
-    const res = await $http.post('/users/signup', props);
+    const res = await axios.post('/users/verify-reset-password', props);
     console.log(res?.data);
     return res?.data;
   } catch (e: any) {

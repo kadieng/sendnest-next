@@ -8,18 +8,29 @@ import { EyeSlashFilledIcon } from '@/components/EyeSlashFilledIcon';
 import { Card, CardBody } from '@nextui-org/card';
 import { useMutation } from '@tanstack/react-query';
 import { verifyResetPassword } from '@/app/http/auth';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function PasswordReset() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [isVisible, setIsVisible] = React.useState(false);
   const [isVisible2, setIsVisible2] = React.useState(false);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
   const toggleVisibility2 = () => setIsVisible2(!isVisible2);
 
+  const email = searchParams.get('email');
+
   const { mutate, isLoading } = useMutation(verifyResetPassword, {
     onSuccess: (data) => {
-      if (data.status === 200) {
-        // onSuccess logic
+      if (data.statusCode === 201) {
+        router.push(`/login`);
+
+        setResetPasswordDetails({
+          otp: '',
+          password: '',
+        });
         return;
       }
     },
@@ -29,29 +40,28 @@ export default function PasswordReset() {
     },
   });
 
-  const [loginDetails, setLoginDetails] = useState({
-    email: '',
+  const [resetPasswordDetails, setResetPasswordDetails] = useState({
+    otp: '',
     password: '',
   });
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    setLoginDetails((prev) => ({ ...prev, [name]: value }));
+    setResetPasswordDetails((prev) => ({ ...prev, [name]: value }));
   };
 
-  console.log(loginDetails);
+  console.log(resetPasswordDetails);
 
   const handleVerifyResetPassword = (event: any) => {
     event.preventDefault();
 
-    console.log(loginDetails);
+    console.log(resetPasswordDetails);
 
     try {
-      // mutate({ email: values.email, password: values.password });
-    } catch (error) {}
-
-    // No need to reset so if there is error, user can easily find it
-    // form.reset();
+      mutate({ email: email as string, password: resetPasswordDetails.password, otp: resetPasswordDetails.otp });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -77,7 +87,15 @@ export default function PasswordReset() {
           <form onSubmit={handleVerifyResetPassword} action="#" method="POST" className="mx-auto w-full mt-10 max-w-lg">
             <div className="grid grid-cols-1 gap-x-8 gap-y-6">
               <div>
-                <Input type="number" label="OTP Code" placeholder="****" variant="bordered" />
+                <Input
+                  type="number"
+                  label="OTP Code"
+                  placeholder="****"
+                  variant="bordered"
+                  onChange={handleChange}
+                  name="otp"
+                  value={resetPasswordDetails.otp}
+                />
               </div>
               <div>
                 <Input
@@ -94,6 +112,9 @@ export default function PasswordReset() {
                     </button>
                   }
                   type={isVisible ? 'text' : 'password'}
+                  name="password"
+                  value={resetPasswordDetails.password}
+                  onChange={handleChange}
                 />
               </div>
               <div>
@@ -115,7 +136,7 @@ export default function PasswordReset() {
               </div>
             </div>
             <div className="mt-5">
-              <Button color="primary" type="submit" className="block w-full">
+              <Button color="primary" type="submit" className="block w-full" isLoading={isLoading}>
                 Reset Password
               </Button>
             </div>

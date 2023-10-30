@@ -1,33 +1,58 @@
 'use client';
+
 import { Input } from '@nextui-org/input';
 import { EyeSlashFilledIcon } from '@/components/EyeSlashFilledIcon';
 import { EyeFilledIcon } from '@/components/EyeFilledIcon';
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { Link } from '@nextui-org/link';
 import { Button } from '@nextui-org/button';
 import { useMutation } from '@tanstack/react-query';
 import { login } from '@/app/http/auth';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Login() {
+  const { handleUser } = useAuth();
+  const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
+  const [loginDetails, setLoginDetails] = useState({
+    email: '',
+    password: '',
+  });
+
   const { mutate, isLoading } = useMutation(login, {
     onSuccess: (data) => {
-      if (data.status === 200) {
-        // onSuccess logic
-        return;
-      }
+      console.log(data);
+      handleUser(data);
+      setLoginDetails({
+        email: '',
+        password: '',
+      });
+
+      router.push('/dashboard');
+
+      // if (data.status === 201) {
+      //   // onSuccess logic
+
+      //   console.log(data);
+
+      //   handleUser(data);
+
+      //   setLoginDetails({
+      //     email: '',
+      //     password: '',
+      //   });
+
+      //   router.push('/dashboard');
+      //   return;
+      // }
     },
     onError: (error: any) => {
       console.log(error);
     },
-  });
-
-  const [loginDetails, setLoginDetails] = useState({
-    email: '',
-    password: '',
   });
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -43,7 +68,7 @@ export default function Login() {
     console.log(loginDetails);
 
     try {
-      // mutate({ email: values.email, password: values.password });
+      mutate({ username: loginDetails.email, password: loginDetails.password });
     } catch (error) {}
 
     // No need to reset so if there is error, user can easily find it
@@ -78,6 +103,7 @@ export default function Login() {
               label="Email"
               placeholder="a@b.c"
               variant="bordered"
+              value={loginDetails.email}
             />
           </div>
           <div>
@@ -97,6 +123,7 @@ export default function Login() {
                 </button>
               }
               type={isVisible ? 'text' : 'password'}
+              value={loginDetails.password}
             />
             <div className="flex items-center mt-2 justify-end">
               <div className="text-sm">
@@ -108,7 +135,7 @@ export default function Login() {
           </div>
         </div>
         <div className="mt-5">
-          <Button color="primary" type="submit" className="block w-full">
+          <Button color="primary" type="submit" className="block w-full" isLoading={isLoading}>
             Login
           </Button>
         </div>

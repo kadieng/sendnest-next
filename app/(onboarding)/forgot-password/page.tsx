@@ -5,9 +5,11 @@ import { Link } from '@nextui-org/link';
 import { Button } from '@nextui-org/button';
 import { useMutation } from '@tanstack/react-query';
 import { forgotPassword } from '@/app/http/auth';
+import { useRouter } from 'next/navigation';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
+  const router = useRouter();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
@@ -17,7 +19,8 @@ export default function ForgotPassword() {
 
   const { mutate, isLoading } = useMutation(forgotPassword, {
     onSuccess: (data) => {
-      if (data.status === 200) {
+      if (data.statusCode === 201) {
+        router.push(`/password-reset/?email=${email}`);
         return;
       }
     },
@@ -32,7 +35,7 @@ export default function ForgotPassword() {
     console.log({ email: email });
 
     try {
-      // mutate({ email: values.email, password: values.password });
+      mutate({ email: email });
     } catch (error) {}
   };
   return (
@@ -67,7 +70,7 @@ export default function ForgotPassword() {
           </div>
         </div>
         <div className="mt-5">
-          <Button color="primary" type="submit" className="block w-full">
+          <Button color="primary" type="submit" className="block w-full" isLoading={isLoading}>
             Reset Password
           </Button>
         </div>
