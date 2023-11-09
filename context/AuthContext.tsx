@@ -11,6 +11,8 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
     setUser(value);
   };
 
+  // console.log(user, 'from context');
+
   const contextValue: AuthContextProps = {
     user,
     handleUser,

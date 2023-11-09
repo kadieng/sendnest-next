@@ -10,11 +10,13 @@ import { useMutation } from '@tanstack/react-query';
 import { login } from '@/app/http/auth';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useApi } from '@/hooks/useApi';
 
 export default function Login() {
   const { handleUser } = useAuth();
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
+  const { makeRequest } = useApi();
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
@@ -25,30 +27,21 @@ export default function Login() {
 
   const { mutate, isLoading } = useMutation(login, {
     onSuccess: (data) => {
-      console.log(data);
-      handleUser(data);
-      setLoginDetails({
-        email: '',
-        password: '',
-      });
+      if (data.statusCode === 201) {
+        console.log(data);
 
-      router.push('/dashboard');
+        // handleUser(data.data);
 
-      // if (data.status === 201) {
-      //   // onSuccess logic
+        sessionStorage.setItem('s_user_token', data?.data.accessToken);
 
-      //   console.log(data);
+        setLoginDetails({
+          email: '',
+          password: '',
+        });
 
-      //   handleUser(data);
-
-      //   setLoginDetails({
-      //     email: '',
-      //     password: '',
-      //   });
-
-      //   router.push('/dashboard');
-      //   return;
-      // }
+        router.push('/dashboard');
+        return;
+      }
     },
     onError: (error: any) => {
       console.log(error);

@@ -30,23 +30,21 @@ export interface AuthContextProps {
   handleUser: (value: User | undefined) => void;
 }
 
-export type User = {
-  _id: string;
+export interface User {
+  IsLoggedIn: true;
+  IsVerified: true;
+  address: string;
+  avatar: string;
+  country: string;
+  email: string;
   firstName: string;
+  id: string;
   lastName: string;
   middleName: string;
-  country: string;
-  state: string;
-  address: string;
-  role: string;
+  password: string;
   phone: string;
-  avatar: string;
-  email: string;
-  IsLoggedIn: boolean;
-  IsVerified: boolean;
+  postalCode: null;
+  role: string;
+  state: string;
   username: string;
-  createdAt: string;
-  updatedAt: string;
-  accessToken: string;
-  refreshToken: string;
-};
+}

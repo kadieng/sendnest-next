@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import {
   Bars3Icon,
   BellIcon,
@@ -16,9 +16,11 @@ import { Dialog, Menu, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import Image from 'next/image';
 import Logo from '@/images/logo.png';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Link } from '@nextui-org/link';
 import { useAuth } from '@/context/AuthContext';
+import useUser from '@/hooks/useUser';
+import useUserSession from '@/hooks/useUserSession';
 
 const navigation = [
   { name: 'Overview', href: '/dashboard', icon: HomeIcon, current: true },
@@ -32,17 +34,32 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
-const userNavigation = [
-  { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
-];
+// const userNavigation = [
+//   { name: 'Your profile', href: '#' },
+//   { name: 'Sign out', href: '#' },
+// ];
 
 const inter = Inter({ subsets: ['latin'] });
 export default function SNDashNavigations() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const currentRoute = usePathname();
 
-  const { user } = useAuth();
+  const { user } = useUser();
+  const { logout } = useUserSession();
+  const router = useRouter();
+
+  const userNavigation = [
+    {
+      name: 'Your profile',
+      func: () => {
+        router.push('/dashboard/settings');
+      },
+    },
+    { name: 'Sign out', func: logout },
+  ];
+
+  // console.log(user, 'dash navigation.tsx');
+
   return (
     <>
       <Transition.Root show={sidebarOpen} as={Fragment}>
@@ -231,11 +248,7 @@ export default function SNDashNavigations() {
               <Menu as="div" className="relative">
                 <Menu.Button className="-m-1.5 flex items-center p-1.5">
                   <span className="sr-only">Open user menu</span>
-                  <img
-                    className="h-8 w-8 rounded-full bg-gray-50"
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                    alt=""
-                  />
+                  <img className="h-8 w-8 rounded-full bg-gray-50" src={user?.avatar} alt="" />
                   <span className="hidden lg:flex lg:items-center">
                     <span className="ml-4 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">
                       {user?.firstName} {user?.lastName}
@@ -256,15 +269,15 @@ export default function SNDashNavigations() {
                     {userNavigation.map((item) => (
                       <Menu.Item key={item.name}>
                         {({ active }) => (
-                          <a
-                            href={item.href}
+                          <button
                             className={classNames(
-                              active ? 'bg-gray-50' : '',
-                              'block px-3 py-1 text-sm leading-6 text-gray-900',
+                              active ? 'bg-gray-50 w-full' : '',
+                              'block px-3 py-1 w-full text-sm leading-6 text-gray-900',
                             )}
+                            onClick={item.func}
                           >
                             {item.name}
-                          </a>
+                          </button>
                         )}
                       </Menu.Item>
                     ))}

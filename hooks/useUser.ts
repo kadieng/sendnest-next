@@ -1,24 +1,22 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import { refreshToken } from '@/app/http/auth';
+import { useEffect, useState } from 'react';
+import { getLoggedInUser } from '@/utils/authedRoutes';
+import queryClient from '@/utils/queries';
+import { User } from '@/@types';
 
 export default function useUser() {
-  const token = sessionStorage.getItem('s_user_token');
+  const { data, isSuccess, isError } = getLoggedInUser();
+  const [user, setUser] = useState<User>();
 
-  const { data: user, isLoading } = useQuery(['user'], () => refreshToken({ refresh: token }), {
-    onSuccess: (data) => {
-      if (data.statusCode === 201) {
-        console.log(data);
+  // console.log(data?.data, 'from useUser');
 
-        return;
-      }
-    },
-    onError: (error: any) => {
-      console.log(error);
-    },
-    enabled: !!token,
-  });
+  useEffect(() => {
+    if (isSuccess && !isError) {
+      setUser(data?.data);
+      queryClient.invalidateQueries(['user']);
+    }
+  }, [data]);
 
   return { user };
 }

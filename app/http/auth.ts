@@ -1,5 +1,5 @@
-import axios from '@/utils/http';
-import $http from '@/utils/http';
+// import axiosAuth from '@/hooks/useAxiosAuth';
+import axios, { $http } from '@/utils/http';
 
 export const register = async (props: {
   firstName: string;
@@ -14,7 +14,7 @@ export const register = async (props: {
   phone: string;
 }) => {
   try {
-    const res = await axios.post('/users/signup', props);
+    const res = await axios.post('/auth/signup', props);
     console.log(res?.data);
     return res?.data;
   } catch (e: any) {
@@ -37,17 +37,6 @@ export const verifyUserToken = async (props: { email: string; otp: string }) => 
 export const login = async (props: { username: string; password: string }) => {
   try {
     const res = await axios.post('/auth/login', props);
-    console.log(res?.data);
-    return res?.data;
-  } catch (e: any) {
-    console.log(e);
-    throw e.response.data || { message: e.message };
-  }
-};
-
-export const refreshToken = async (payload: any) => {
-  try {
-    const res = await $http.get('/users/me', payload);
     console.log(res?.data);
     return res?.data;
   } catch (e: any) {
