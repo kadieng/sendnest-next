@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import useUser from '@/hooks/useUser';
 import useUserSession from '@/hooks/useUserSession';
+import Image from 'next/image';
 
 export function SNDashboardNavbar() {
   const { user } = useUser();
@@ -64,7 +65,7 @@ export function SNDashboardNavbar() {
           <Menu as="div" className="relative">
             <Menu.Button className="-m-1.5 flex items-center p-1.5">
               <span className="sr-only">Open user menu</span>
-              <img className="h-8 w-8 rounded-full bg-gray-50" src={user?.avatar} alt="" />
+              {user?.avatar && <Image className="h-8 w-8 rounded-full bg-gray-50" src={user.avatar} alt="" />}
               <span className="hidden lg:flex lg:items-center">
                 <span className="ml-4 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">
                   {user?.firstName} {user?.lastName}

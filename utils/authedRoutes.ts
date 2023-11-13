@@ -30,3 +30,9 @@ export const getLoggedInUser = () => {
     return makeRequest(`/users/me`, 'get');
   });
 };
+
+export const walletBalance = () => {
+  return useQuery(['wallet-balance'], async () => {
+    return makeRequest(`/wallet/wallet-balance`, 'get');
+  });
+};

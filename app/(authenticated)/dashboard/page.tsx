@@ -35,15 +35,19 @@ export default function Dashboard() {
               <h1 className="font-radio-canada text-3xl font-light">N800.00</h1>
 
               <div className="flex -space-x-2">
-                <img
+                <Image
                   className="inline-block h-[2.375rem] w-[2.375rem] rounded-full ring-2 ring-white dark:ring-gray-800"
                   src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80"
                   alt="country flag"
+                  width={38}
+                  height={38}
                 />
-                <img
+                <Image
                   className="inline-block h-[2.375rem] w-[2.375rem] rounded-full ring-2 ring-white dark:ring-gray-800"
                   src="https://images.unsplash.com/photo-1531927557220-a9e23c1e4794?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80"
                   alt="country flag"
+                  width={38}
+                  height={38}
                 />
               </div>
             </div>

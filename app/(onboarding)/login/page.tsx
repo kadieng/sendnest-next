@@ -53,12 +53,12 @@ export default function Login() {
     setLoginDetails((prev) => ({ ...prev, [name]: value }));
   };
 
-  console.log(loginDetails);
+  // console.log(loginDetails);
 
   const handleLogin = (event: any) => {
     event.preventDefault();
 
-    console.log(loginDetails);
+    // console.log(loginDetails);
 
     try {
       mutate({ username: loginDetails.email, password: loginDetails.password });

@@ -34,7 +34,7 @@ export interface User {
   IsLoggedIn: true;
   IsVerified: true;
   address: string;
-  avatar: string;
+  avatar?: string;
   country: string;
   email: string;
   firstName: string;

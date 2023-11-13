@@ -87,9 +87,9 @@ export default function Register() {
   };
 
   useEffect(() => {
-    console.log(selectedCountry);
-    console.log(selectedCountry?.name);
-    console.log(selectedState);
+    // console.log(selectedCountry);
+    // console.log(selectedCountry?.name);
+    // console.log(selectedState);
   }, [selectedCountry, selectedState]);
 
   return (

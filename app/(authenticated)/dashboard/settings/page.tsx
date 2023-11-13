@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { Input, Textarea } from '@nextui-org/input';
 import { Select, SelectItem } from '@nextui-org/select';
 import { states } from '@/app/(onboarding)/data';
+import Image from 'next/image';
 
 export default function Profile() {
   const [selectedState, setSelectedState] = useState('');
@@ -22,10 +23,12 @@ export default function Profile() {
       <h1 className="text-3xl font-bold text-[#424242]">Personal Information</h1>
       <div className="mt-4 border-b border-t border-[#E9E9E9]">
         <div className="hidden items-center gap-6 py-5 md:flex">
-          <img
+          <Image
             className="inline-block h-[7rem] w-[7rem] rounded-full ring-2 ring-white dark:ring-gray-800"
             src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80"
             alt="Image Description"
+            width={112}
+            height={112}
           />
 
           <div className="font-inter">
