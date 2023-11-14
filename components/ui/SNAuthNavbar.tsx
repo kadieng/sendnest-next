@@ -15,7 +15,7 @@ export function SNAuthNavbar() {
         {name: "Register", value: "register"},
         {name: "Forgot Password", value: "forgot-password"},
     ];
-    const scrollRez = (e) => {
+    const scrollRez = (e: any) => {
         console.log(e)
     }
     return (
