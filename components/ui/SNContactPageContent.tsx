@@ -41,9 +41,9 @@ export default function SNContactPageContent() {
                   <BuildingOffice2Icon className="h-7 w-6 text-gray-400" aria-hidden="true" />
                 </dt>
                 <dd>
-                  545 Mavis Island
+                  63 Pomona Street,
                   <br />
-                  Chicago, IL 99191
+                  Suncity, Abuja.
                 </dd>
               </div>
               <div className="flex gap-x-4">
@@ -53,7 +53,7 @@ export default function SNContactPageContent() {
                 </dt>
                 <dd>
                   <a className="hover:text-gray-900" href="tel:+1 (555) 234-5678">
-                    +1 (555) 234-5678
+                    +234 703 609 4572
                   </a>
                 </dd>
               </div>
@@ -64,7 +64,7 @@ export default function SNContactPageContent() {
                 </dt>
                 <dd>
                   <a className="hover:text-gray-900" href="mailto:hello@example.com">
-                    hello@example.com
+                    greenisletechnologies@yahoo.com
                   </a>
                 </dd>
               </div>
