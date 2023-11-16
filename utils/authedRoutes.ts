@@ -1,3 +1,4 @@
+import { CreateBeneficiaries } from '@/@types';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 
@@ -35,4 +36,21 @@ export const walletBalance = () => {
   return useQuery(['wallet-balance'], async () => {
     return makeRequest(`/wallet/wallet-balance`, 'get');
   });
+};
+
+export const getBeneficiaries = () => {
+  return useQuery(['get-beneficiaries'], async () => {
+    return makeRequest(`/users/get_all/beneficiaries`, 'get');
+  });
+};
+
+export const useCreateBeneficiaries = () => {
+  const createBeneficiaries = useMutation((createBeneficiariesData: CreateBeneficiaries): any => {
+    return makeRequest(`/users/create/beneficiaries`, 'post', createBeneficiariesData);
+  });
+
+  return {
+    createBeneficiaries: createBeneficiaries.mutate,
+    isLoading: createBeneficiaries.isLoading,
+  };
 };

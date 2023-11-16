@@ -48,3 +48,17 @@ export interface User {
   state: string;
   username: string;
 }
+
+export interface GetBeneficiaries {
+  accountName: string;
+  accountNumber: string;
+  bankName: string;
+  id: string;
+  user_id: string;
+}
+
+export interface CreateBeneficiaries {
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
+}
