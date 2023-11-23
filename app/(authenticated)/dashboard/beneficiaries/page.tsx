@@ -1,7 +1,6 @@
 'use client';
 
 import React, { ChangeEvent, useEffect, useState } from 'react';
-import { getBeneficiaries } from '@/utils/authedRoutes';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import {
   Modal,
@@ -19,7 +18,7 @@ import {
 } from '@nextui-org/react';
 import queryClient from '@/utils/queries';
 import { GetBeneficiaries, CreateBeneficiaries } from '@/@types';
-import { useCreateBeneficiaries } from '@/utils/authedRoutes';
+import { useGetBeneficiaries, useCreateBeneficiaries } from '@/utils/authedRoutes';
 import { banks } from './banks';
 
 export default function Beneficiaries() {
@@ -29,7 +28,7 @@ export default function Beneficiaries() {
     accountName: '',
     accountNumber: '',
   });
-  const { data: beneficiaries, isLoading, isSuccess, isError } = getBeneficiaries();
+  const { data: beneficiaries, isLoading, isSuccess, isError } = useGetBeneficiaries();
   console.log(details);
 
   useEffect(() => {
@@ -189,6 +188,7 @@ export default function Beneficiaries() {
                   color="primary"
                   onPress={onClose}
                   className=" w-full mb-8 mt-4"
+                  isLoading={isCreatingBeneficiaries}
                 >
                   Add
                 </Button>

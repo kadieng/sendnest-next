@@ -6,6 +6,7 @@ import { Button } from '@nextui-org/button';
 import { useMutation } from '@tanstack/react-query';
 import { forgotPassword } from '@/app/http/auth';
 import { useRouter } from 'next/navigation';
+import { toastError } from '@/helpers/toast';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -26,6 +27,8 @@ export default function ForgotPassword() {
     },
     onError: (error: any) => {
       console.log(error);
+
+      toastError({ description: error.message });
     },
   });
 
@@ -70,7 +73,7 @@ export default function ForgotPassword() {
           </div>
         </div>
         <div className="mt-5">
-          <Button color="primary" type="submit" className="block w-full" isLoading={isLoading}>
+          <Button color="primary" type="submit" className="w-full" isLoading={isLoading}>
             Reset Password
           </Button>
         </div>

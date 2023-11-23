@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Link } from '@nextui-org/link';
 import Image from 'next/image';
 
-function classNames(...classes: any) {
+function classNames(...classes: (string | boolean | undefined | null)[]): string {
   return classes.filter(Boolean).join(' ');
 }
 

@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getLoggedInUser } from '@/utils/authedRoutes';
+import { useGetLoggedInUser } from '@/utils/authedRoutes';
 import queryClient from '@/utils/queries';
 import { User } from '@/@types';
 
 export default function useUser() {
-  const { data, isSuccess, isError } = getLoggedInUser();
+  const { data, isSuccess, isError } = useGetLoggedInUser();
   const [user, setUser] = useState<User>();
 
   // console.log(data?.data, 'from useUser');

@@ -18,7 +18,6 @@ import Image from 'next/image';
 import Logo from '@/images/logo.png';
 import { usePathname, useRouter } from 'next/navigation';
 import { Link } from '@nextui-org/link';
-import { useAuth } from '@/context/AuthContext';
 import useUser from '@/hooks/useUser';
 import useUserSession from '@/hooks/useUserSession';
 
@@ -29,15 +28,9 @@ const navigation = [
   { name: 'Beneficiaries', href: '/dashboard/beneficiaries', icon: UsersIcon, current: false },
 ];
 
-// @ts-ignore
-function classNames(...classes) {
+function classNames(...classes: (string | boolean | undefined | null)[]): string {
   return classes.filter(Boolean).join(' ');
 }
-
-// const userNavigation = [
-//   { name: 'Your profile', href: '#' },
-//   { name: 'Sign out', href: '#' },
-// ];
 
 const inter = Inter({ subsets: ['latin'] });
 export default function SNDashNavigations() {
@@ -45,6 +38,7 @@ export default function SNDashNavigations() {
   const currentRoute = usePathname();
 
   const { user } = useUser();
+  // console.log(user);
   const { logout } = useUserSession();
   const router = useRouter();
 
@@ -248,7 +242,7 @@ export default function SNDashNavigations() {
                   <span className="sr-only">Open user menu</span>
                   {user?.avatar && (
                     <Image
-                      className="h-8 w-8 rounded-full bg-gray-50"
+                      className="h-8 w-8 rounded-full bg-gray-50 object-cover"
                       height={32}
                       width={32}
                       src={user.avatar}

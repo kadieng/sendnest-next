@@ -62,3 +62,22 @@ export interface CreateBeneficiaries {
   accountName: string;
   accountNumber: string;
 }
+
+export interface UpdateUser {
+  file: File | null;
+  username: string;
+  phone: string;
+  country: string;
+  state: string;
+  address: string;
+}
+
+export interface PasswordUpdate {
+  oldpassword: string;
+  newpassword: string;
+}
+
+export interface ToastSuccessProps {
+  description: string;
+  //   stay?: boolean;
+}

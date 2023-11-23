@@ -11,6 +11,8 @@ import { login } from '@/app/http/auth';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useApi } from '@/hooks/useApi';
+import { toast } from 'react-hot-toast';
+import { toastError, toastSuccess } from '@/helpers/toast';
 
 export default function Login() {
   const { handleUser } = useAuth();
@@ -28,9 +30,7 @@ export default function Login() {
   const { mutate, isLoading } = useMutation(login, {
     onSuccess: (data) => {
       if (data.statusCode === 201) {
-        console.log(data);
-
-        // handleUser(data.data);
+        // console.log(data);
 
         sessionStorage.setItem('s_user_token', data?.data.accessToken);
 
@@ -39,12 +39,16 @@ export default function Login() {
           password: '',
         });
 
+        toastSuccess({ description: data.message });
+
         router.push('/dashboard');
         return;
       }
     },
     onError: (error: any) => {
-      console.log(error);
+      // console.log(error);
+
+      toastError({ description: error.message[0] });
     },
   });
 
@@ -53,12 +57,8 @@ export default function Login() {
     setLoginDetails((prev) => ({ ...prev, [name]: value }));
   };
 
-  // console.log(loginDetails);
-
   const handleLogin = (event: any) => {
     event.preventDefault();
-
-    // console.log(loginDetails);
 
     try {
       mutate({ username: loginDetails.email, password: loginDetails.password });
@@ -128,7 +128,7 @@ export default function Login() {
           </div>
         </div>
         <div className="mt-5">
-          <Button color="primary" type="submit" className="block w-full" isLoading={isLoading}>
+          <Button color="primary" type="submit" className=" w-full" isLoading={isLoading}>
             Login
           </Button>
         </div>
@@ -136,7 +136,6 @@ export default function Login() {
       <p className="mt-5 text-center text-sm text-gray-500">
         Don’t have an account?
         <Link href="/register" className="font-medium leading-6 ml-2">
-          {' '}
           Register
         </Link>
       </p>
