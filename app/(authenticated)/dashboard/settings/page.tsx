@@ -8,12 +8,7 @@ import { useUpdateUser } from '@/utils/authedRoutes';
 import useUser from '@/hooks/useUser';
 import { ArrowUpOnSquareIcon } from '@heroicons/react/24/outline';
 import { toastError, toastSuccess } from '@/helpers/toast';
-import { UpdateUser } from '@/@types';
-
-interface UserAvatar {
-  link?: string | null;
-  file?: File | null;
-}
+import { UpdateUser, UserAvatar } from '@/@types';
 
 export default function Profile() {
   const { updateUser, isLoading } = useUpdateUser();
@@ -24,7 +19,6 @@ export default function Profile() {
     file: null,
   });
   const [updateUserDetails, setUpdateUserDetails] = useState<UpdateUser>({
-    file: null,
     username: '',
     phone: '',
     country: '',
@@ -36,15 +30,12 @@ export default function Profile() {
   useEffect(() => {
     if (user) {
       setUpdateUserDetails({
-        file: null,
         username: user.username || '',
         phone: user.phone || '',
         country: user.country || '',
         state: user.state || '',
         address: user.address || '',
       });
-
-      // setImageSrc(user?.avatar as any);
 
       setUserAvatar({
         link: user?.avatar || null,
@@ -70,9 +61,6 @@ export default function Profile() {
       const reader = new FileReader();
 
       reader.onloadend = () => {
-        // Set the image source to the data URL
-        // setImageSrc(reader.result as string);
-
         setUserAvatar({
           link: reader.result as string,
           file: newFile,
@@ -131,10 +119,10 @@ export default function Profile() {
       <h1 className="text-3xl font-bold text-[#424242]">Personal Information</h1>
       <div className="mt-4 border-b border-t border-[#E9E9E9]">
         <div className="hidden items-center gap-6 py-5 md:flex h-[10rem]">
-          <div className=" w-[7rem] h-[7rem]">
+          <div className=" w-[7rem] h-[7rem] ">
             {userAvatar.link && (
               <Image
-                className="inline-block h-[7rem] w-[7rem] rounded-full ring-2 ring-white dark:ring-gray-800 object-cover"
+                className="inline-block h-full w-full rounded-full object-cover"
                 src={userAvatar.link}
                 alt="Image Description"
                 width={112}
@@ -162,8 +150,6 @@ export default function Profile() {
             <Button isIconOnly aria-label="Upload Image" onClick={handleImageClick}>
               <ArrowUpOnSquareIcon className=" h-6 w-6" />
             </Button>
-
-            {/* <Button className="bg-primary text-white">Update</Button> */}
           </div>
         </div>
 
@@ -183,45 +169,6 @@ export default function Profile() {
                 className={isEditMode ? 'cursor-not-allowed' : ''}
               />
             </div>
-            {/* <div className="pt-8">
-              <Input
-                type="text"
-                label="First Name"
-                // placeholder="Jon"
-                variant="bordered"
-                name="firstName"
-                labelPlacement={'outside'}
-                onChange={handleInputChange}
-                value={updateUserDetails.firstName}
-                isDisabled={isEditMode}
-              />
-            </div>
-            <div className="pt-8">
-              <Input
-                type="text"
-                label="Last Name"
-                // placeholder="Snow"
-                variant="bordered"
-                name="lastName"
-                labelPlacement={'outside'}
-                onChange={handleInputChange}
-                value={updateUserDetails.lastName}
-                isDisabled={isEditMode}
-              />
-            </div> */}
-            {/* <div className="pt-8">
-              <Input
-                type="text"
-                label="Middle Name"
-                // placeholder="Doe"
-                variant="bordered"
-                name="middleName"
-                labelPlacement={'outside'}
-                onChange={handleInputChange}
-                value={updateUserDetails.middleName}
-                isDisabled={isEditMode}
-              />
-            </div> */}
             <div className="pt-8">
               <Input
                 type="tel"

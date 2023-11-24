@@ -64,7 +64,7 @@ export interface CreateBeneficiaries {
 }
 
 export interface UpdateUser {
-  file: File | null;
+  // file: File | null;
   username: string;
   phone: string;
   country: string;
@@ -80,4 +80,14 @@ export interface PasswordUpdate {
 export interface ToastSuccessProps {
   description: string;
   //   stay?: boolean;
+}
+
+export interface Bank {
+  code: string;
+  name: string;
+}
+
+interface UserAvatar {
+  link?: string | null;
+  file?: File | null;
 }
