@@ -7,6 +7,13 @@ import { Card, CardBody } from '@nextui-org/card';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { verifyUserToken } from '@/app/http/auth';
+import { toastSuccess, toastError } from '@/helpers/toast';
+
+interface SignupData {
+  email: string;
+  otp: string;
+  // Add more properties if needed
+}
 
 export default function CompleteSignup() {
   const router = useRouter();
@@ -32,6 +39,8 @@ export default function CompleteSignup() {
       if (data.statusCode === 201) {
         console.log(data);
 
+        toastSuccess({ description: data.message });
+
         router.push(`/login`);
 
         return;
@@ -39,14 +48,16 @@ export default function CompleteSignup() {
     },
     onError: (error: any) => {
       console.log(error);
+
+      toastError({ description: error.message[0] });
     },
   });
 
-  const handleCompleteSignup = (event: any) => {
+  const handleCompleteSignup = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     try {
-      mutate({ email: email, otp: otp } as any);
+      mutate({ email, otp } as any);
     } catch (error) {
       console.log(error);
     }
@@ -88,7 +99,7 @@ export default function CompleteSignup() {
               </div>
             </div>
             <div className="mt-5">
-              <Button color="primary" type="submit" className="block w-full" isLoading={isLoading}>
+              <Button color="primary" type="submit" className="w-full" isLoading={isLoading}>
                 Complete Signup
               </Button>
             </div>
@@ -96,7 +107,6 @@ export default function CompleteSignup() {
           <p className="mt-5 text-center text-sm text-gray-500">
             Don’t have an account?
             <Link href="/register" className="font-medium leading-6 ml-2">
-              {' '}
               Register
             </Link>
           </p>

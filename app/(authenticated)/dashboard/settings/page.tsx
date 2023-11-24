@@ -1,111 +1,243 @@
 'use client';
 
-import { Button } from '@nextui-org/button';
-import React, { useState } from 'react';
-import { Input, Textarea } from '@nextui-org/input';
-import { Select, SelectItem } from '@nextui-org/select';
-import { states } from '@/app/(onboarding)/data';
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { Button } from '@nextui-org/button';
+import { Input, Textarea } from '@nextui-org/input';
+import { useUpdateUser } from '@/utils/authedRoutes';
+import useUser from '@/hooks/useUser';
+import { ArrowUpOnSquareIcon } from '@heroicons/react/24/outline';
+import { toastError, toastSuccess } from '@/helpers/toast';
+import { UpdateUser, UserAvatar } from '@/@types';
 
 export default function Profile() {
-  const [selectedState, setSelectedState] = useState('');
-  // const [lgas, setLgas] = useState([]);
-  // const [lga, setLga] = useState('');
-  // const handleState = (e) => {
-  //   setSelectedState(e.target.value);
-  //   setLgas(states.find((stat) => stat.state == e.target.value).lgas);
-  // };
-  // const handleLGA = (e) => {
-  //   setLga(e.target.value);
-  // };
+  const { updateUser, isLoading } = useUpdateUser();
+  const { user } = useUser();
+  const hiddenFileInput = useRef<HTMLInputElement>(null);
+  const [userAvatar, setUserAvatar] = useState<UserAvatar>({
+    link: null,
+    file: null,
+  });
+  const [updateUserDetails, setUpdateUserDetails] = useState<UpdateUser>({
+    username: '',
+    phone: '',
+    country: '',
+    state: '',
+    address: '',
+  });
+  const [isEditMode, setIsEditMode] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      setUpdateUserDetails({
+        username: user.username || '',
+        phone: user.phone || '',
+        country: user.country || '',
+        state: user.state || '',
+        address: user.address || '',
+      });
+
+      setUserAvatar({
+        link: user?.avatar || null,
+        file: null,
+      });
+    }
+  }, [user]);
+
+  const toggleEditMode = () => {
+    setIsEditMode(!isEditMode);
+  };
+
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setUpdateUserDetails((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      const newFile = event.target.files[0];
+      console.log(newFile);
+
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        setUserAvatar({
+          link: reader.result as string,
+          file: newFile,
+        });
+      };
+      reader.readAsDataURL(newFile);
+    }
+  };
+
+  const handleImageClick = () => {
+    if (hiddenFileInput.current) {
+      hiddenFileInput.current.click();
+    }
+  };
+
+  const handleUpdateUser = (e: any) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+
+    // Loop through the updateUserDetails object and append each key-value pair to the formData
+    for (const key in updateUserDetails) {
+      if (Object.hasOwnProperty.call(updateUserDetails, key)) {
+        const value = updateUserDetails[key as keyof UpdateUser]; // Type assertion for key
+        formData.append(key, value as any);
+      }
+    }
+
+    if (userAvatar.file) {
+      formData.append('file', userAvatar.file);
+    }
+
+    const formDataObject: { [key: string]: string | Blob } = {};
+
+    formData.forEach((value, key) => {
+      formDataObject[key] = value instanceof Blob ? value : String(value);
+    });
+
+    console.log(formDataObject);
+
+    updateUser(formData, {
+      onSuccess: (response: any) => {
+        console.log(response);
+        if (response.statusCode < 300) {
+          toastSuccess({ description: response.message });
+        }
+      },
+      onError: (error: any) => {
+        toastError({ description: error.message });
+      },
+    });
+  };
+
   return (
     <>
       <h1 className="text-3xl font-bold text-[#424242]">Personal Information</h1>
       <div className="mt-4 border-b border-t border-[#E9E9E9]">
-        <div className="hidden items-center gap-6 py-5 md:flex">
-          <Image
-            className="inline-block h-[7rem] w-[7rem] rounded-full ring-2 ring-white dark:ring-gray-800"
-            src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80"
-            alt="Image Description"
-            width={112}
-            height={112}
-          />
+        <div className="hidden items-center gap-6 py-5 md:flex h-[10rem]">
+          <div className=" w-[7rem] h-[7rem] ">
+            {userAvatar.link && (
+              <Image
+                className="inline-block h-full w-full rounded-full object-cover"
+                src={userAvatar.link}
+                alt="Image Description"
+                width={112}
+                height={112}
+              />
+            )}
+          </div>
 
-          <div className="font-inter">
+          <div className="font-inter w-[50%] 2xl:w-[40%]">
             <h3 className="font-medium text-[#424242]">Profile</h3>
             <p className="text-[#5B5B5B] md:w-[60%] lg:w-[70%]">
               This information will be displayed publicly so be careful what you share.
             </p>
           </div>
-          <div className="upload-btn">
-            <Button className="bg-blue-600 text-white">Update</Button>
-          </div>
-        </div>
 
-        <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
-          <div>
-            <Input type="text" label="First Name" placeholder="Jon" variant="bordered" />
-          </div>
-          <div>
-            <Input type="text" label="Last Name" placeholder="Snow" variant="bordered" />
-          </div>
-          <div>
-            <Input type="text" label="Middle Name" placeholder="Doe" variant="bordered" />
-          </div>
-          <div>
-            <Input type="tel" label="Phone Number" placeholder="0123456789" variant="bordered" />
-          </div>
-          <div>
-            <Select
-              color="primary"
-              label="Select State"
-              placeholder="Select a state"
-              // onChange={handleState}
-            >
-              {states.map((stat) => (
-                <SelectItem key={stat.state} value={stat.state}>
-                  {stat.state}
-                </SelectItem>
-              ))}
-            </Select>
-          </div>
-          <div>
-            <Select
-              color="primary"
-              label="Select LGA"
-              placeholder="Select a lga"
-              // onChange={handleLGA}
-            >
-              {/* {lgas.map((lga) => (
-                <SelectItem key={lga} value={lga}>
-                  {lga}
-                </SelectItem>
-              ))} */}
-            </Select>
-          </div>
-          <div className="sm:col-span-2">
-            <Textarea
-              variant="bordered"
-              label="Address"
-              placeholder="Enter your current Address"
-              className="col-span-12 md:col-span-6 mb-6 md:mb-0"
+          <div className="upload-btn flex items-center gap-3">
+            <Input
+              type="file"
+              ref={hiddenFileInput}
+              className=" hidden"
+              onChange={handleImageChange}
+              accept="image/*"
             />
+
+            <Button isIconOnly aria-label="Upload Image" onClick={handleImageClick}>
+              <ArrowUpOnSquareIcon className=" h-6 w-6" />
+            </Button>
           </div>
         </div>
-        <div className="mt-4 border-b border-t border-[#E9E9E9]" />
 
-        <div className="flex justify-end py-10">
-          <div className="flex gap-8">
-            <Button color="danger" className="block w-full">
+        <form onSubmit={handleUpdateUser}>
+          <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
+            <div className="pt-8">
+              <Input
+                type="text"
+                label="Username"
+                // placeholder="Jon"
+                variant="bordered"
+                name="username"
+                labelPlacement={'outside'}
+                onChange={handleInputChange}
+                value={updateUserDetails.username}
+                isDisabled={isEditMode}
+                className={isEditMode ? 'cursor-not-allowed' : ''}
+              />
+            </div>
+            <div className="pt-8">
+              <Input
+                type="tel"
+                label="Phone Number"
+                // placeholder="0123456789"
+                variant="bordered"
+                name="phone"
+                labelPlacement={'outside'}
+                onChange={handleInputChange}
+                value={updateUserDetails.phone}
+                isDisabled={isEditMode}
+              />
+            </div>
+            <div className="pt-8">
+              <Input
+                type="text"
+                label="Country"
+                variant="bordered"
+                name="country"
+                labelPlacement={'outside'}
+                onChange={handleInputChange}
+                value={updateUserDetails.country}
+                isDisabled={isEditMode}
+              />
+            </div>
+            <div className="pt-8">
+              <Input
+                type="text"
+                label="State"
+                variant="bordered"
+                name="state"
+                labelPlacement={'outside'}
+                onChange={handleInputChange}
+                value={updateUserDetails.state}
+                isDisabled={isEditMode}
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <Textarea
+                variant="bordered"
+                label="Address"
+                // placeholder="Enter your current Address"
+                className="col-span-12 md:col-span-6 mb-6 md:mb-0"
+                labelPlacement={'outside'}
+                onChange={handleInputChange}
+                name="address"
+                value={updateUserDetails.address}
+                isDisabled={isEditMode}
+              />
+            </div>
+          </div>
+          <div className="mt-4 border-b border-t border-[#E9E9E9]" />
+
+          <div className="flex justify-end py-10">
+            <div className="flex gap-8">
+              {/* <Button color="danger" className="block w-full">
               Cancel
-            </Button>
-            <Button className="bg-blue-600 text-white">Edit</Button>
+            </Button> */}
+              <Button onClick={toggleEditMode} className="border-2 border-primary bg-white">
+                Edit
+              </Button>
 
-            <Button color="success" type="submit" className="block w-full">
-              Save
-            </Button>
+              <Button type="submit" isLoading={isLoading} className="block w-full bg-primary text-white">
+                Save
+              </Button>
+            </div>
           </div>
-        </div>
+        </form>
       </div>
     </>
   );

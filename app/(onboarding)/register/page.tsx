@@ -13,8 +13,9 @@ import { useMutation } from '@tanstack/react-query';
 import { Country, State } from 'country-state-city';
 import { CountryType, StateType } from '../../../@types';
 import { useRouter } from 'next/navigation';
+import { toastError } from '@/helpers/toast';
 
-function classNames({ ...classes }: any) {
+function classNames(...classes: (string | boolean | undefined | null)[]): string {
   return classes.filter(Boolean).join(' ');
 }
 
@@ -54,6 +55,8 @@ export default function Register() {
     onError: (error: any) => {
       // notify({ message: error.message, type: 'error' });
       console.log(error);
+
+      toastError({ description: error.message });
     },
   });
 
@@ -264,7 +267,7 @@ export default function Register() {
           </div>
         </div>
         <div className="mt-10">
-          <Button color="primary" type="submit" className="block w-full" isLoading={isLoading}>
+          <Button color="primary" type="submit" className="w-full" isLoading={isLoading}>
             Create Account
           </Button>
         </div>

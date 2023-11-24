@@ -4,12 +4,12 @@ import WalletImg from '@/images/wallet.png';
 import { PlusIcon, Square2StackIcon } from '@heroicons/react/24/outline';
 import SNInfoCard from '@/components/ui/SNInfoCard';
 import Image from 'next/image';
-import { walletBalance } from '@/utils/authedRoutes';
+import { useGetWalletBalance } from '@/utils/authedRoutes';
 import { useEffect } from 'react';
 import queryClient from '@/utils/queries';
 
 export default function Wallet() {
-  const { data: wallet, isSuccess, isError } = walletBalance();
+  const { data: wallet, isSuccess, isError } = useGetWalletBalance();
   //   console.log(wallet);
 
   useEffect(() => {

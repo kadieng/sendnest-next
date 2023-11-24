@@ -1,4 +1,3 @@
-// import axiosAuth from '@/hooks/useAxiosAuth';
 import axios, { $http } from '@/utils/http';
 
 export const register = async (props: {

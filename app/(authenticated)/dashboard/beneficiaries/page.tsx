@@ -1,7 +1,6 @@
 'use client';
 
 import React, { ChangeEvent, useEffect, useState } from 'react';
-import { getBeneficiaries } from '@/utils/authedRoutes';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import {
   Modal,
@@ -17,32 +16,38 @@ import {
   Select,
   SelectItem,
 } from '@nextui-org/react';
-import queryClient from '@/utils/queries';
-import { GetBeneficiaries, CreateBeneficiaries } from '@/@types';
-import { useCreateBeneficiaries } from '@/utils/authedRoutes';
-import { banks } from './banks';
+import { GetBeneficiaries, CreateBeneficiaries, Bank } from '@/@types';
+import { useGetBeneficiaries, useCreateBeneficiaries, useGetBanks } from '@/utils/authedRoutes';
+import { toastError, toastSuccess } from '@/helpers/toast';
 
 export default function Beneficiaries() {
   const { createBeneficiaries, isLoading: isCreatingBeneficiaries } = useCreateBeneficiaries();
+  const { data: bankResponse, isLoading: isGettingBanks, isError: unableToGetBanks } = useGetBanks();
   const [details, setDetails] = useState<CreateBeneficiaries>({
     bankName: '',
     accountName: '',
     accountNumber: '',
   });
-  const { data: beneficiaries, isLoading, isSuccess, isError } = getBeneficiaries();
-  console.log(details);
+  const { data: beneficiaries, isLoading, isSuccess, isError } = useGetBeneficiaries();
+  const [banks, setBanks] = useState<Bank[]>([]);
 
-  useEffect(() => {
-    if (isSuccess && !isError) {
-      queryClient.invalidateQueries(['get-beneficiaries']);
-    }
-  }, [beneficiaries]);
-
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    setDetails((prev) => ({ ...prev, [name]: value }));
+
+    // Check if the value is a positive number before updating state
+    if (name === 'accountNumber') {
+      // Remove any non-digit characters from the input
+      const sanitizedValue = value.replace(/[^0-9]/g, ''); // Allow only digits
+
+      // Ensures the value is not empty and is a valid positive number or handle empty values
+      if (sanitizedValue === '' || (!isNaN(parseInt(sanitizedValue, 10)) && parseInt(sanitizedValue, 10) >= 0)) {
+        setDetails((prev) => ({ ...prev, [name]: sanitizedValue }));
+      }
+    } else {
+      setDetails((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSelectChange = (event: React.ChangeEvent<{ value: any; name: any }>) => {
@@ -51,24 +56,41 @@ export default function Beneficiaries() {
   };
 
   const handleCreateBeneficiaries = () => {
+    console.log(details);
     createBeneficiaries(details, {
       onSuccess: (response: any) => {
         console.log(response);
         if (response.statusCode < 300) {
-          // client.invalidateQueries(['get-vendor']);
-          // toast.success(response.response.status || 'This vendor is no longer banned');
-          // handleBack(router);
+          toastSuccess({ description: response.message });
+          onClose();
+
+          setDetails({
+            bankName: '',
+            accountName: '',
+            accountNumber: '',
+          });
         } else {
-          // toast.error(response.response.data.message || response.response.data.error);
+          toastError({ description: response.response.data.message || response.response.data.error });
         }
       },
-      onError: () => {
-        // client.invalidateQueries(['get-vendor']);
-        // toast.success('This vendor is no longer banned');
-        // handleBack(router);
+      onError: (error: any) => {
+        toastError({ description: error.message });
       },
     });
   };
+
+  useEffect(() => {
+    if (bankResponse) {
+      const bankArray = Object.entries<string>(bankResponse.data).map(([code, name]) => ({
+        code,
+        name,
+      }));
+
+      bankArray.sort((a, b) => a.name.localeCompare(b.name));
+
+      setBanks(bankArray);
+    }
+  }, [bankResponse]);
 
   return (
     <div className="flex flex-col px-3 md:px-7 lg:px-10">
@@ -134,7 +156,7 @@ export default function Beneficiaries() {
         </div>
       </div>
 
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="top-center">
+      <Modal backdrop="blur" isOpen={isOpen} onOpenChange={onOpenChange} placement="top-center">
         <ModalContent>
           {(onClose) => (
             <>
@@ -153,7 +175,7 @@ export default function Beneficiaries() {
                   //   className="max-w-xs"
                 >
                   {(bank) => (
-                    <SelectItem key={bank.name} value={bank.name}>
+                    <SelectItem key={bank?.name} value={bank.name}>
                       {bank.name}
                     </SelectItem>
                   )}
@@ -172,10 +194,9 @@ export default function Beneficiaries() {
                 />
 
                 <Input
-                  //   endContent={<LockIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />}
                   label="Account Number"
                   placeholder="Enter receivers account number"
-                  type="number"
+                  type="text"
                   variant="bordered"
                   labelPlacement={'outside'}
                   name="accountNumber"
@@ -187,8 +208,9 @@ export default function Beneficiaries() {
                 <Button
                   onClick={handleCreateBeneficiaries}
                   color="primary"
-                  onPress={onClose}
+                  // onPress={onClose}
                   className=" w-full mb-8 mt-4"
+                  isLoading={isCreatingBeneficiaries}
                 >
                   Add
                 </Button>

@@ -9,6 +9,7 @@ import { Card, CardBody } from '@nextui-org/card';
 import { useMutation } from '@tanstack/react-query';
 import { verifyResetPassword } from '@/app/http/auth';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { toastSuccess } from '@/helpers/toast';
 
 export default function PasswordReset() {
   const router = useRouter();
@@ -31,6 +32,8 @@ export default function PasswordReset() {
           otp: '',
           password: '',
         });
+
+        toastSuccess({ description: data.message });
         return;
       }
     },
@@ -136,7 +139,7 @@ export default function PasswordReset() {
               </div>
             </div>
             <div className="mt-5">
-              <Button color="primary" type="submit" className="block w-full" isLoading={isLoading}>
+              <Button color="primary" type="submit" className="w-full" isLoading={isLoading}>
                 Reset Password
               </Button>
             </div>
