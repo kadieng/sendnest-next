@@ -6,7 +6,7 @@ import queryClient from '@/utils/queries';
 import { User } from '@/@types';
 
 export default function useUser() {
-  const { data, isSuccess, isError } = useGetLoggedInUser();
+  const { data, isSuccess, isError, refetch } = useGetLoggedInUser();
   const [user, setUser] = useState<User>();
 
   // console.log(data?.data, 'from useUser');
@@ -18,5 +18,5 @@ export default function useUser() {
     }
   }, [data]);
 
-  return { user };
+  return { user, refetch };
 }

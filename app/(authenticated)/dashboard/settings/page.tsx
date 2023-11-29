@@ -12,7 +12,7 @@ import { UpdateUser, UserAvatar } from '@/@types';
 
 export default function Profile() {
   const { updateUser, isLoading } = useUpdateUser();
-  const { user } = useUser();
+  const { user, refetch } = useUser();
   const hiddenFileInput = useRef<HTMLInputElement>(null);
   const [userAvatar, setUserAvatar] = useState<UserAvatar>({
     link: null,
@@ -105,6 +105,7 @@ export default function Profile() {
       onSuccess: (response: any) => {
         console.log(response);
         if (response.statusCode < 300) {
+          refetch();
           toastSuccess({ description: response.message });
         }
       },
